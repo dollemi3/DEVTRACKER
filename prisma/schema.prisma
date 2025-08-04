@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:@localhost:3306/Project"
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  password      String
+  username      String
+  statusMessage String?   @default("")
+  profileImage  String?   @default("")
+  usingTech     String?   @default("[]")
+  createdAt     DateTime  @default(now())
+  projects      Project[] @relation(name: "UserProjects")
+  comments      Comment[]
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], name: "UserProjects")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  calendarEvents CalendarEvent[]
+  tasks          Task[]
+  codeSnippets   CodeSnippet[]
+}
+
+model CalendarEvent {
+  id        Int      @id @default(autoincrement())
+  title     String
+  date      DateTime
+  type      String
+  description String
+  project   Project  @relation(fields: [projectId], references: [id])
+  projectId Int
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Task {
+  id        Int      @id @default(autoincrement())  // ← taskId → id 로 변경
+  title     String
+  completed Boolean  @default(false)
+  priority  String
+  
+  project   Project  @relation(fields: [projectId], references: [id])
+  projectId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CodeSnippet {
+  id        Int      @id @default(autoincrement())
+  projectId Int
+  title     String
+  language  String
+  content   String
+  isPublic  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  project  Project   @relation(fields: [projectId], references: [id])
+  comments Comment[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  codeId    Int
+  authorId  Int
+  content   String
+  createdAt DateTime @default(now())
+
+  code   CodeSnippet @relation(fields: [codeId], references: [id])
+  author User        @relation(fields: [authorId], references: [id])
+}
