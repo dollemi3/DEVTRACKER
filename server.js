@@ -19,7 +19,7 @@ app.use("/api/snippet", codeSnippetRoutes);
 app.use("/api/calendar", calendarRoutes);
 app.use("/api/task", taskRoutes);
 
-const PORT = process.env.PORT || 3001;
+const port = process.env.PORT || 4000 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
